@@ -1,142 +1,104 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.co.informaticslab.sandpit;
 
-import intel.pcsdk.PXCUPipeline;
-import intel.pcsdk.PXCMPoint3DF32;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JApplet;
-import javax.swing.JFrame;
+import com.jme3.app.SimpleApplication;
+import com.jme3.material.Material;
+import com.jme3.renderer.RenderManager;
+import com.jme3.terrain.geomipmap.TerrainLodControl;
+import com.jme3.terrain.geomipmap.TerrainQuad;
+import com.jme3.texture.Texture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author Tom
- */
-public class Application extends JApplet {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-    private static final Logger LOG = Logger.getLogger(Application.class.getName());
-    
+public class Application extends SimpleApplication {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Application.class);
+
     public static void main(String[] args) {
-
-        PXCUPipeline pp = new PXCUPipeline();
-        //we must initialise each stream we wish to sample
-        if (!pp.Init(PXCUPipeline.COLOR_VGA | PXCUPipeline.GESTURE | PXCUPipeline.DEPTH_QVGA_60FPS)) {
-            System.out.println("Failed to initialize PXCUPipeline (camera input streams)\n");
-            System.exit(3);
-        }
-
-        int[] depthMapSize = new int[2];
-        pp.QueryDepthMapSize(depthMapSize);
-        System.out.println("Depth map size x : " + depthMapSize[0]);
-        System.out.println("Depth map size y : " + depthMapSize[1]);
-
-        int[] colorMapSize = new int[2];
-        pp.QueryRGBSize(colorMapSize);
-        System.out.println("Color map size x :" + colorMapSize[0]);
-        System.out.println("Color map size y :" + colorMapSize[1]);
-        
-        int[] irMapSize = new int[2];
-        pp.QueryIRMapSize(irMapSize);
-        System.out.println("IR map size x :" + irMapSize[0]);
-        System.out.println("IR map size y :" + irMapSize[1]);
-
         Application app = new Application();
-        DrawFrame df = new DrawFrame(colorMapSize[0], colorMapSize[1]);
-        app.add(df);
-
-        JFrame frame = new JFrame("MOLAB Perceptual Computing SDK Java Sample");
-        Listener listener = new Listener();
-        frame.addWindowListener(listener);
-        frame.setSize(depthMapSize[0], depthMapSize[1]);
-        frame.add(app);
-        frame.setVisible(true);
-//        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        
-        PXCMPoint3DF32[] points3D = new PXCMPoint3DF32[depthMapSize[0] * depthMapSize[1]];
-        
-        short[] depthMap = new short[depthMapSize[0] * depthMapSize[1]];
-        
-        //loop whilst the app window is open
-        while (!listener.exit) {
-            //capture a frame
-            pp.AcquireFrame(true);
-            //get the depth map from the frame
-//            pp.QueryDepthMap(depthMap);
-            pp.QueryIRMap(depthMap);
-            
-            //step through the depth map and store as a point
-            int x = 0;
-            int y = 0;
-            for(int i = 0; i< depthMap.length; i ++){
-                if(i % depthMapSize[0] == 0) {
-                    x = 0;
-                    y++;
-                }
-                points3D[i] = new PXCMPoint3DF32(x, y, depthMap[i]);
-                x++;
-            }
-            
-            //draw the image
-            for(int i = 0; i < points3D.length; i ++){
-                int height = (int)points3D[i].z;
-                if(i%100 == 0) {
-                    System.out.println(height);
-                }
-                df.image.setRGB((int) points3D[i].x, (int) points3D[i].y, height);
-                
-            }
-            df.repaint();
-            
-            //sleep to avoid memory issues
-//            try {
-//                Thread.sleep(2000l);
-//            } catch (InterruptedException ex) {
-//                LOG.log(Level.SEVERE, "Thread sleep interrupted", ex);
-//            }
-            //must release the frame in order to capture a new one on the next loop
-            pp.ReleaseFrame();
-        }
-        
-        pp.Close();
-        System.exit(0);
+        app.start();
     }
-}
 
-/**
- * ~Listens for exit event on jframe
- */
-class Listener extends WindowAdapter {
-
-    public boolean exit = false;
+    private TerrainQuad terrain;
 
     @Override
-    public void windowClosing(WindowEvent e) {
-        exit = true;
+    public void simpleInitApp() {
+        LOG.debug("Initialising app");
+        flyCam.setMoveSpeed(50f);
+
+        Material mat_terrain;
+        /** 1. Create terrain material and load four textures into it. */
+        mat_terrain = new Material(assetManager,
+                "Common/MatDefs/Terrain/Terrain.j3md");
+
+        /** 1.1) Add ALPHA map (for red-blue-green coded splat textures) */
+        mat_terrain.setTexture("Alpha", assetManager.loadTexture(
+                "Textures/Terrain/splat/alphamap.png"));
+
+        /** 1.2) Add GRASS texture into the red layer (Tex1). */
+        Texture grass = assetManager.loadTexture(
+                "Textures/Terrain/splat/grass.jpg");
+        grass.setWrap(Texture.WrapMode.Repeat);
+        mat_terrain.setTexture("Tex1", grass);
+        mat_terrain.setFloat("Tex1Scale", 64f);
+
+        /** 1.3) Add DIRT texture into the green layer (Tex2) */
+        Texture dirt = assetManager.loadTexture(
+                "Textures/Terrain/splat/dirt.jpg");
+        dirt.setWrap(Texture.WrapMode.Repeat);
+        mat_terrain.setTexture("Tex2", dirt);
+        mat_terrain.setFloat("Tex2Scale", 32f);
+
+        /** 1.4) Add ROAD texture into the blue layer (Tex3) */
+        Texture rock = assetManager.loadTexture(
+                "Textures/Terrain/splat/road.jpg");
+        rock.setWrap(Texture.WrapMode.Repeat);
+        mat_terrain.setTexture("Tex3", rock);
+        mat_terrain.setFloat("Tex3Scale", 128f);
+
+        terrain = new TerrainQuad("my terrain", 65, 513, getRandom());
+
+        terrain.setMaterial(mat_terrain);
+        terrain.setLocalTranslation(0, -100, 0);
+        terrain.setLocalScale(2f, 1f, 2f);
+        rootNode.attachChild(terrain);
+
+        /** 5. The LOD (level of detail) depends on were the camera is: */
+        TerrainLodControl control = new TerrainLodControl(terrain, getCamera());
+        terrain.addControl(control);
     }
-}
 
-/**
- * Image that gets drawn into the jframe window
- */
-class DrawFrame extends Component {
-
-    public BufferedImage image;
-
-    public DrawFrame(int width, int height) {
-        image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_555_RGB);
+    @Override
+    public void simpleUpdate(float tpf) {
+        LOG.trace("update");
+        //TODO: add update code
     }
 
-    public void paint(Graphics g) {
-        ((Graphics2D) g).drawImage(image, 0, 0, null);
+    @Override
+    public void simpleRender(RenderManager rm) {
+        LOG.trace("render");
+        //TODO: add render code
     }
+
+    private float[] getRandom() {
+        Random rn = new Random();
+        int x = 512;
+        int y = 512;
+        int max = 50;
+        int min = 0;
+        List<Float> floatList = new ArrayList<>();
+        for (int i = 0; i < x * y; i++) {
+            floatList.add((float) rn.nextInt(max - min + 1) + min);
+        }
+        float[] floatArray = new float[floatList.size()];
+        int i = 0;
+        for (Float f : floatList) {
+            floatArray[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
+        }
+        return floatArray;
+    }
+
 }
