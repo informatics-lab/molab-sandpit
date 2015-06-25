@@ -12,6 +12,10 @@ import uk.co.informaticslab.sandpit.domain.Dimension2D;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.io.impl.Mock3DCamera;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Application extends SimpleApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
@@ -31,6 +35,13 @@ public class Application extends SimpleApplication {
         flyCam.setMoveSpeed(100f);
 
         camera = new Mock3DCamera();
+
+        Set<Short> uvs = new HashSet<>();
+        for (short value : camera.sampleDepthMap()) {
+            uvs.add(value);
+        }
+        System.out.println(uvs.size());
+
         Dimension2D terrainDimensions = new Dimension2D(512, 512);
         
         
