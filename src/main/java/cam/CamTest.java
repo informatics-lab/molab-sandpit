@@ -1,5 +1,6 @@
 package cam;
 
+import ch.qos.logback.classic.util.ContextInitializer;
 import intel.pcsdk.PXCMPoint3DF32;
 import intel.pcsdk.PXCUPipeline;
 import org.slf4j.Logger;
@@ -7,9 +8,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
 
 /**
  * @author Tom
@@ -27,7 +34,7 @@ public class CamTest extends JApplet {
             System.exit(3);
         }
 
-        int[] depthMapSize = new int[2];
+        final int[] depthMapSize = new int[2];
         pp.QueryDepthMapSize(depthMapSize);
         System.out.println("Depth map size x : " + depthMapSize[0]);
         System.out.println("Depth map size y : " + depthMapSize[1]);
@@ -50,13 +57,51 @@ public class CamTest extends JApplet {
         Listener listener = new Listener();
         frame.addWindowListener(listener);
         frame.setSize(depthMapSize[0], depthMapSize[1]);
+        
+
+        final short[] depthMap = new short[depthMapSize[0] * depthMapSize[1]];
+        final File dataFile = new File("height-map.dat");
+        
+        JButton button = new JButton("snap"); 
+        button.setBounds(320, 0, 100, 30);
+        button.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                int xMax = depthMapSize[0];
+                int yMax = depthMapSize[1];
+                System.out.println("xMax: " + xMax);
+                System.out.println("yMax: " + yMax);
+                
+                try (FileWriter fw = new FileWriter(dataFile)) {
+                    
+                    for (int y = 0; y < yMax; y++) {
+                        StringBuilder rowBuilder = new StringBuilder();
+                        for (int x = 0; x < xMax; x++) {
+                            int index = x + y * xMax;
+                            short value = depthMap[index];
+                            rowBuilder.append(value).append(',');
+                        }
+                        CharSequence row = rowBuilder.subSequence(0, rowBuilder.length() - 1);
+                        fw.write(row.toString());
+                        fw.write("\n");
+                    }
+                    
+                    fw.flush();
+                    
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(CamTest.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
+        frame.add(button);
         frame.add(app);
         frame.setVisible(true);
 //        frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
         PXCMPoint3DF32[] points3D = new PXCMPoint3DF32[depthMapSize[0] * depthMapSize[1]];
-
-        short[] depthMap = new short[depthMapSize[0] * depthMapSize[1]];
 
         //loop whilst the app window is open
         while (!listener.exit) {
@@ -65,7 +110,7 @@ public class CamTest extends JApplet {
             //get the depth map from the frame
             pp.QueryDepthMap(depthMap);
 //            pp.QueryIRMap(depthMap);
-
+            
             //step through the depth map and store as a point
             int x = 0;
             int y = 0;
@@ -81,7 +126,50 @@ public class CamTest extends JApplet {
             //draw the image
             for (int i = 0; i < points3D.length; i++) {
                 int height = (int) points3D[i].z;
-                df.image.setRGB((int) points3D[i].x, (int) points3D[i].y, height);
+                int value;
+                if (height <= 100) {
+                 value = Color.blue.getRGB();
+                } else if (height <= 200) {
+                 value = Color.green.getRGB();
+                } else if (height <= 300) {
+                 value = Color.red.getRGB();
+                } else if (height <= 400) {
+                 value = Color.gray.getRGB();
+                } else if (height <= 500) {
+                 value = Color.pink.getRGB();
+                } else if (height <= 600) {
+                 value = Color.yellow.getRGB();
+                } else if (height <= 700) {
+                 value = 70;   
+                } else if (height <= 800) {
+                 value = 80;   
+                } else if (height <= 900) {
+                 value = 90;   
+                } else if (height <= 1000) {
+                 value = 100;   
+                } else {
+                 value = 0;   
+                }
+                
+                int rgb;
+                if (height > 2000) {
+                    rgb = 0;
+                } else {
+                    int t1 = height - 521;
+                    if (t1 < 0) {
+                        t1 = 0;
+                    }
+                    double t2 = t1 / 465.0;
+                    int t3 = (int) (t2 * 255);
+                    if (t3 > 255) {
+                        t3 = 255;
+                    }
+                    t3 = Math.abs(t3 - 255);
+                    
+                    rgb = toGreyScale(t3);
+                }
+                
+                df.image.setRGB((int) points3D[i].x, (int) points3D[i].y, rgb);
 
             }
             df.repaint();
@@ -99,6 +187,14 @@ public class CamTest extends JApplet {
         pp.Close();
         System.exit(0);
     }
+    
+    private static int toGreyScale(int value) {
+        return ((0 & 0xFF) << 24) |
+                ((value & 0xFF) << 16) |
+                ((value & 0xFF) << 8) |
+                ((value & 0xFF) << 0);
+    }
+    
 }
 
 /**
