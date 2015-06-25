@@ -60,6 +60,7 @@ public class HelloTerrain extends SimpleApplication {
         AbstractHeightMap heightmap = null;
         Texture heightMapImage = assetManager.loadTexture(
                 "Textures/Terrain/splat/mountains512.png");
+
         heightmap = new ImageBasedHeightMap(heightMapImage.getImage());
         heightmap.load();
 

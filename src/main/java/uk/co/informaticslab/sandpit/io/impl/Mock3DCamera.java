@@ -39,7 +39,7 @@ public class Mock3DCamera implements Camera3D {
         List<short[]> rowValues = new ArrayList<>();
         int totalLength = 0;
 
-        File dataFile = new File("/Users/rich/IdeaProjects/molab-sandpit/height-map.dat");
+        File dataFile = new File("/Users/rich/IdeaProjects/molab-sandpit/height-map-2.dat");
         try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
 
             for (String row = reader.readLine(); row != null; row = reader.readLine()) {
