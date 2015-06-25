@@ -63,8 +63,8 @@ public class CamTest extends JApplet {
             //capture a frame
             pp.AcquireFrame(true);
             //get the depth map from the frame
-//            pp.QueryDepthMap(depthMap);
-            pp.QueryIRMap(depthMap);
+            pp.QueryDepthMap(depthMap);
+//            pp.QueryIRMap(depthMap);
 
             //step through the depth map and store as a point
             int x = 0;
@@ -81,9 +81,6 @@ public class CamTest extends JApplet {
             //draw the image
             for (int i = 0; i < points3D.length; i++) {
                 int height = (int) points3D[i].z;
-                if (i % 100 == 0) {
-                    System.out.println(height);
-                }
                 df.image.setRGB((int) points3D[i].x, (int) points3D[i].y, height);
 
             }

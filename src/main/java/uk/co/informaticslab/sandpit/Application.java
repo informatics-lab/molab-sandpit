@@ -5,13 +5,12 @@ import com.jme3.material.Material;
 import com.jme3.renderer.RenderManager;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
-import com.jme3.texture.Texture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import uk.co.informaticslab.sandpit.domain.Dimension2D;
+import uk.co.informaticslab.sandpit.io.Camera3D;
+import uk.co.informaticslab.sandpit.io.impl.Mock3DCamera;
 
 public class Application extends SimpleApplication {
 
@@ -23,45 +22,24 @@ public class Application extends SimpleApplication {
     }
 
     private TerrainQuad terrain;
-
+    private Camera3D camera;
+    
     @Override
     public void simpleInitApp() {
+        
         LOG.debug("Initialising app");
-        flyCam.setMoveSpeed(50f);
+        flyCam.setMoveSpeed(100f);
 
-        Material mat_terrain;
-        /** 1. Create terrain material and load four textures into it. */
-        mat_terrain = new Material(assetManager,
-                "Common/MatDefs/Terrain/Terrain.j3md");
+        camera = new Mock3DCamera();
+        Dimension2D terrainDimensions = new Dimension2D(512, 512);
+        
+        
+        Material mat = new Material(assetManager,
+          "Common/MatDefs/Misc/ShowNormals.j3md");
 
-        /** 1.1) Add ALPHA map (for red-blue-green coded splat textures) */
-        mat_terrain.setTexture("Alpha", assetManager.loadTexture(
-                "Textures/Terrain/splat/alphamap.png"));
+        terrain = new TerrainQuad("my terrain", 65, 513, regridSample(camera.sampleDepthMap(), camera.getDepthMapDimensions(), terrainDimensions));
 
-        /** 1.2) Add GRASS texture into the red layer (Tex1). */
-        Texture grass = assetManager.loadTexture(
-                "Textures/Terrain/splat/grass.jpg");
-        grass.setWrap(Texture.WrapMode.Repeat);
-        mat_terrain.setTexture("Tex1", grass);
-        mat_terrain.setFloat("Tex1Scale", 64f);
-
-        /** 1.3) Add DIRT texture into the green layer (Tex2) */
-        Texture dirt = assetManager.loadTexture(
-                "Textures/Terrain/splat/dirt.jpg");
-        dirt.setWrap(Texture.WrapMode.Repeat);
-        mat_terrain.setTexture("Tex2", dirt);
-        mat_terrain.setFloat("Tex2Scale", 32f);
-
-        /** 1.4) Add ROAD texture into the blue layer (Tex3) */
-        Texture rock = assetManager.loadTexture(
-                "Textures/Terrain/splat/road.jpg");
-        rock.setWrap(Texture.WrapMode.Repeat);
-        mat_terrain.setTexture("Tex3", rock);
-        mat_terrain.setFloat("Tex3Scale", 128f);
-
-        terrain = new TerrainQuad("my terrain", 65, 513, getRandom());
-
-        terrain.setMaterial(mat_terrain);
+        terrain.setMaterial(mat);
         terrain.setLocalTranslation(0, -100, 0);
         terrain.setLocalScale(2f, 1f, 2f);
         rootNode.attachChild(terrain);
@@ -82,23 +60,26 @@ public class Application extends SimpleApplication {
         LOG.trace("render");
         //TODO: add render code
     }
-
-    private float[] getRandom() {
-        Random rn = new Random();
-        int x = 512;
-        int y = 512;
-        int max = 50;
-        int min = 0;
-        List<Float> floatList = new ArrayList<>();
-        for (int i = 0; i < x * y; i++) {
-            floatList.add((float) rn.nextInt(max - min + 1) + min);
-        }
-        float[] floatArray = new float[floatList.size()];
+    
+    private float[] regridSample(short[] data, Dimension2D current, Dimension2D required) {
+        float[] requiredArray = new float[required.getWidth() * required.getHeight()];
         int i = 0;
-        for (Float f : floatList) {
-            floatArray[i++] = (f != null ? f : Float.NaN); // Or whatever default you want.
+        System.out.println("data length " + data.length);
+        for(int y = 0; y < required.getHeight(); y++) {
+            for(int x = 0; x < required.getWidth(); x++) {
+                if(x < current.getWidth() && y < current.getHeight() && i < data.length) {
+                    if (data[i] == 32001) {    
+                        requiredArray[i] = 0f;
+                    } else {
+                        requiredArray[i] = data[i];
+                    }
+                } else {
+                    requiredArray[i] = 0f;
+                }
+                i++;
+            }
         }
-        return floatArray;
+        return requiredArray;
     }
 
 }
