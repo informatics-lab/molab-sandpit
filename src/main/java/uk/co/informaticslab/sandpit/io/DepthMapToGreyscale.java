@@ -1,6 +1,8 @@
 package uk.co.informaticslab.sandpit.io;
 
+import uk.co.informaticslab.sandpit.domain.DepthMap;
 import uk.co.informaticslab.sandpit.io.impl.Mock3DCamera;
+import uk.co.informaticslab.sandpit.utils.DepthMapUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,10 +14,11 @@ public class DepthMapToGreyscale {
     public static void main(String[] args) throws IOException {
 
         Mock3DCamera camera = new Mock3DCamera();
-        short[] depthMap = camera.sampleDepthMap();
+        DepthMap dm = DepthMapUtils.getDepthMapFromCamera(camera);
+        Short[] depthMap = dm.getTrustedSample().toArray(new Short[0]);
+
 
         BufferedImage image = new BufferedImage(320, 240, BufferedImage.TYPE_BYTE_GRAY);
-
         int i = 0;
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
@@ -30,8 +33,8 @@ public class DepthMapToGreyscale {
 //                    int t3 = (int) (t2 * 255);
 
 
-                    int t1 = rgb - 400;
-                    double t2 = t1 / 850.0;
+                    int t1 = rgb - dm.getMin();
+                    double t2 = t1 / ((double) dm.getMax() - dm.getMin());
                     int t3 = (int) (t2 * 255);
 
                     t3 = Math.abs(t3 - 255);

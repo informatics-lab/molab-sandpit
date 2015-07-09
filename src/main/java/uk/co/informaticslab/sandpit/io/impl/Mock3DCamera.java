@@ -8,29 +8,21 @@ package uk.co.informaticslab.sandpit.io.impl;
 import uk.co.informaticslab.sandpit.domain.Dimension2D;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Tom
  */
 public class Mock3DCamera implements Camera3D {
 
     @Override
     public Dimension2D getDepthMapDimensions() {
-        return new Dimension2D(320,240);
-    }
-
-    @Override
-    public Dimension2D getColorMapDimensions() {
-        return new Dimension2D(320,240);
-    }
-
-    @Override
-    public Dimension2D getIRMapDimensions() {
-        return new Dimension2D(320,240);
+        return new Dimension2D(320, 240);
     }
 
     @Override
@@ -39,7 +31,7 @@ public class Mock3DCamera implements Camera3D {
         List<short[]> rowValues = new ArrayList<>();
         int totalLength = 0;
 
-        File dataFile = new File("/Users/rich/IdeaProjects/molab-sandpit/height-map-2.dat");
+        File dataFile = new File("height-map-2.dat");
         try (BufferedReader reader = new BufferedReader(new FileReader(dataFile))) {
 
             for (String row = reader.readLine(); row != null; row = reader.readLine()) {
@@ -70,14 +62,4 @@ public class Mock3DCamera implements Camera3D {
         return depthMap;
     }
 
-    @Override
-    public short[] sampleIRMap() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int[] sampleColorMap() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

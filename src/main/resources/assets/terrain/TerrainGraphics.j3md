@@ -1,0 +1,15 @@
+MaterialDef TerrainGraphics {
+
+    Technique {
+        VertexShader GLSL100:   assets/terrain/Texture.vert
+        FragmentShader GLSL100: assets/terrain/TerrainGraphics.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+        }
+    }
+
+    Technique {
+    }
+
+}

@@ -6,19 +6,24 @@
 package uk.co.informaticslab.sandpit.io.impl;
 
 import intel.pcsdk.PXCUPipeline;
-import java.io.Closeable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.informaticslab.sandpit.domain.DepthMap;
 import uk.co.informaticslab.sandpit.domain.Dimension2D;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.io.Camera3DException;
 
+import java.io.Closeable;
+
 /**
- *
  * @author Tom
  */
 public class Senz3DCamera implements Camera3D, Closeable {
+
+    public static final short UNTRUSTED_VALUE = 32001;
+
     private static final Logger LOG = LoggerFactory.getLogger(Camera3D.class);
+
     private final PXCUPipeline pipeline;
 
     /**
@@ -46,68 +51,15 @@ public class Senz3DCamera implements Camera3D, Closeable {
         return dim;
     }
 
-    /**
-     * @return the dimensions of the color map
-     */
-    @Override
-    public Dimension2D getColorMapDimensions() {
-        int[] colorMapSize = new int[2];
-        pipeline.QueryRGBSize(colorMapSize);
-        LOG.debug("Color map size width : " + colorMapSize[0]);
-        LOG.debug("Color map size height : " + colorMapSize[1]);
-        Dimension2D dim = new Dimension2D(colorMapSize[0], colorMapSize[1]);
-        return dim;
-    }
-
-    /**
-     * @return the dimensions of the IR map
-     */
-    @Override
-    public Dimension2D getIRMapDimensions() {
-        int[] irMapSize = new int[2];
-        pipeline.QueryIRMapSize(irMapSize);
-        LOG.debug("IR map size width : " + irMapSize[0]);
-        LOG.debug("IR map size height : " + irMapSize[1]);
-        Dimension2D dim = new Dimension2D(irMapSize[0], irMapSize[1]);
-        return dim;
-    }
-    
     @Override
     public short[] sampleDepthMap() {
         pipeline.AcquireFrame(true);
-        
         Dimension2D depthMapSize = getDepthMapDimensions();
-        short[] depthMap = new short[depthMapSize.getWidth() * depthMapSize.getHeight()];
-        pipeline.QueryDepthMap(depthMap);
-        
+        short[] depthMapSample = new short[depthMapSize.getWidth() * depthMapSize.getHeight()];
+        pipeline.QueryDepthMap(depthMapSample);
         pipeline.ReleaseFrame();
-        return depthMap;
+        return depthMapSample;
     }
-    
-    @Override
-    public short[] sampleIRMap() {
-        pipeline.AcquireFrame(true);
-        
-        Dimension2D irMapSize = getIRMapDimensions();
-        short[] irMap = new short[irMapSize.getWidth() * irMapSize.getHeight()];
-        pipeline.QueryIRMap(irMap);
-        
-        pipeline.ReleaseFrame();
-        return irMap;
-    }
-    
-    @Override
-    public int[] sampleColorMap() {
-        pipeline.AcquireFrame(true);
-        
-        Dimension2D colorMapSize = getColorMapDimensions();
-        int[] colorMap = new int[colorMapSize.getWidth() * colorMapSize.getHeight()];
-        pipeline.QueryRGB(colorMap);
-        
-        pipeline.ReleaseFrame();
-        return colorMap;
-    }
-    
 
     @Override
     public void close() {

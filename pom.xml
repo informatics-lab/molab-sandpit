@@ -73,6 +73,18 @@
             <version>${jmonkey.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-bullet</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jme3-bullet-natives</artifactId>
+            <version>${jmonkey.version}</version>
+        </dependency>
+
         <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>

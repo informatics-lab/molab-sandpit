@@ -1,0 +1,20 @@
+MaterialDef TerrainGeometry {
+
+    MaterialParameters {
+        Texture2D RawDepthMap
+    }
+
+    Technique {
+        VertexShader GLSL100:   assets/terrain/Texture.vert
+        FragmentShader GLSL100: assets/terrain/TerrainGeometry.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+        }
+
+    }
+
+    Technique {
+    }
+
+}
