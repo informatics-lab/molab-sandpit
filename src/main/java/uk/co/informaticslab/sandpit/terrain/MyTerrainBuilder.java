@@ -30,7 +30,7 @@ public class MyTerrainBuilder {
     public static TerrainQuad buildAsTerrainQuad(AssetManager assetManager, Camera camera, BulletAppState bulletAppState, Camera3D camera3D) {
 
         DepthMap dm = DepthMapUtils.getDepthMapFromCamera(camera3D);
-        TerrainQuad terrain = new TerrainQuad("terrain", TERRAIN_PATCH_SIZE, 513, HeightMapUtils.createHeightMapFromDepthMap(dm, TERRAIN_QUAD_SIZE));
+        TerrainQuad terrain = new TerrainQuad("terrain", TERRAIN_PATCH_SIZE, 513, HeightMapUtils.createHeightMapFromDepthMap(dm, TERRAIN_QUAD_SIZE, TERRAIN_QUAD_SIZE));
         terrain.setMaterial(getTerrainNormalsMaterial(assetManager));
 
 //        terrain.setLocalTranslation(0, 0, 0);

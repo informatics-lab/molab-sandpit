@@ -1,5 +1,6 @@
 package uk.co.informaticslab.sandpit;
 
+import com.google.common.primitives.Floats;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
@@ -15,11 +16,16 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import com.jme3.terrain.geomipmap.TerrainQuad;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.informaticslab.sandpit.domain.DepthMap;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.io.impl.Mock3DCamera;
+import uk.co.informaticslab.sandpit.io.impl.Senz3DCamera;
 import uk.co.informaticslab.sandpit.terrain.MyTerrainBuilder;
+import uk.co.informaticslab.sandpit.utils.DepthMapUtils;
+import uk.co.informaticslab.sandpit.utils.HeightMapUtils;
 
 public class Application extends SimpleApplication {
 
@@ -53,9 +59,9 @@ public class Application extends SimpleApplication {
 
         viewPort.setBackgroundColor(ColorRGBA.Red);
 
-        settings.setFrameRate(30);
+        settings.setFrameRate(1);
 
-        camera3D = new Mock3DCamera();
+        camera3D = new Senz3DCamera();
 
         bulletAppState = new BulletAppState();
         bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
@@ -70,14 +76,18 @@ public class Application extends SimpleApplication {
         inputManager.addMapping("shoot", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addListener(actionListener, "shoot");
 
-        cam.setLocation(new Vector3f(160, 120, -10));
+        cam.setLocation(new Vector3f(0, 200, -10));
         cam.lookAtDirection(new Vector3f(0, -1.5f, -1).normalizeLocal(), Vector3f.UNIT_Y);
 
     }
 
     @Override
     public void simpleUpdate(float tpf) {
+        
         LOG.trace("update");
+        
+        DepthMap dm = DepthMapUtils.getDepthMapFromCamera(camera3D);
+        terrain.setHeight(HeightMapUtils.HEIGHTMAP_COORDS, Floats.asList(HeightMapUtils.createHeightMapFromDepthMap(dm, 320, 240)));
         //TODO: add update code
         // System.out.println("location : " + cam.getLocation() + ", height : " + cam.getHeight() + ", direction : " + cam.getDirection());
     }
