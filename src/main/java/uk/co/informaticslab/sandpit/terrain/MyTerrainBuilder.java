@@ -3,20 +3,18 @@ package uk.co.informaticslab.sandpit.terrain;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.material.MatParamTexture;
 import com.jme3.material.Material;
 import com.jme3.renderer.Camera;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.terrain.geomipmap.lodcalc.DistanceLodCalculator;
-import com.jme3.terrain.heightmap.HeightMap;
-import com.jme3.terrain.heightmap.ImageBasedHeightMap;
 import com.jme3.texture.Image;
 import com.jme3.texture.Texture2D;
 import uk.co.informaticslab.sandpit.domain.DepthMap;
 import uk.co.informaticslab.sandpit.domain.Dimension2D;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.utils.DepthMapUtils;
+import uk.co.informaticslab.sandpit.utils.HeightMapUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -31,17 +29,13 @@ public class MyTerrainBuilder {
 
     public static TerrainQuad buildAsTerrainQuad(AssetManager assetManager, Camera camera, BulletAppState bulletAppState, Camera3D camera3D) {
 
-
-        HeightMap hm = new ImageBasedHeightMap(createImageFromResizedDepthMap(camera3D));
-        hm.load();
-//        getTerrainGeometry(assetManager, camera3D);
-        //to build this terrain we must have a float[] heightmap.
-        TerrainQuad terrain = new TerrainQuad("terrain", TERRAIN_PATCH_SIZE, 513, null);
-//        terrain.setMaterial(getTerrainNormalsMaterial(assetManager));
-        terrain.setMaterial(getTerrainGeometry(assetManager, camera3D));
+        DepthMap dm = DepthMapUtils.getDepthMapFromCamera(camera3D);
+        TerrainQuad terrain = new TerrainQuad("terrain", TERRAIN_PATCH_SIZE, 513, HeightMapUtils.createHeightMapFromDepthMap(dm, TERRAIN_QUAD_SIZE));
+        terrain.setMaterial(getTerrainNormalsMaterial(assetManager));
 
 //        terrain.setLocalTranslation(0, 0, 0);
-        terrain.setLocalScale(1f, 1f, 1f);
+        int terrainScaleDownFactor = 4;
+        terrain.setLocalScale(1f, 1f/terrainScaleDownFactor, 1f);
         terrain.setLocked(false);
 
         TerrainLodControl control = new TerrainLodControl(terrain, camera);
@@ -55,19 +49,13 @@ public class MyTerrainBuilder {
         return terrain;
     }
 
-    private static Material getTerrainMaterial(AssetManager assetManager) {
-        // TERRAIN TEXTURE material
-        Material material = new Material(assetManager, "assets/terrain/TerrainGraphics.j3md");
-        return material;
-    }
-
     private static Material getTerrainNormalsMaterial(AssetManager assetManager) {
         Material material = new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");
         return material;
     }
 
-    private static Material getTerrainGeometry(AssetManager assetManager, Camera3D camera3D) {
-        Material material = new Material(assetManager, "assets/terrain/TerrainGeometry.j3md");
+    private static Material getTerrainMaterial(AssetManager assetManager, Camera3D camera3D) {
+        Material material = new Material(assetManager, "assets/terrain/Terrain.j3md");
         material.setTexture("RawDepthMap", getRawDepthMapTexture(camera3D));
 
         return material;

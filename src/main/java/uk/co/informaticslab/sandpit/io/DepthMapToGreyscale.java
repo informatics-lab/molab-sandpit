@@ -15,7 +15,7 @@ public class DepthMapToGreyscale {
 
         Mock3DCamera camera = new Mock3DCamera();
         DepthMap dm = DepthMapUtils.getDepthMapFromCamera(camera);
-        Short[] depthMap = dm.getTrustedSample().toArray(new Short[0]);
+        short[] depthMap = dm.getSample();
 
 
         BufferedImage image = new BufferedImage(320, 240, BufferedImage.TYPE_BYTE_GRAY);
@@ -33,13 +33,13 @@ public class DepthMapToGreyscale {
 //                    int t3 = (int) (t2 * 255);
 
 
-                    int t1 = rgb - dm.getMin();
-                    double t2 = t1 / ((double) dm.getMax() - dm.getMin());
-                    int t3 = (int) (t2 * 255);
+//                    int t1 = rgb - dm.getMin();
+//                    double t2 = t1 / ((double) dm.getMax() - dm.getMin());
+//                    int t3 = (int) (t2 * 255);
 
-                    t3 = Math.abs(t3 - 255);
+//                    t3 = Math.abs(t3 - 255);
 
-                    rgb = rgba(t3, t3, t3, 0);
+//                    rgb = rgba(t3, t3, t3, 0);
                 }
 
                 image.setRGB(x, y, rgb);

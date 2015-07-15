@@ -1,7 +1,5 @@
 package uk.co.informaticslab.sandpit.domain;
 
-import java.util.LinkedList;
-
 /**
  * Created by tom on 26/06/2015.
  */
@@ -10,20 +8,23 @@ public class DepthMap {
     private final Dimension2D dimensions;
     private final short min;
     private final short max;
-    private final LinkedList<Short> trustedSample;
+    private final short[] sample;
+    private final short[] rawSample;
+
 
     public DepthMap(Dimension2D dimensions, short[] sample, short... untrustedValues) {
         short min = Short.MAX_VALUE;
         short max = Short.MIN_VALUE;
 
-        LinkedList<Short> trusted = new LinkedList<>();
+        short[] trusted = new short[sample.length];
+        int i = 0;
         for (short s : sample) {
             for (short untrustedValue : untrustedValues) {
                 if (s == untrustedValue) {
                     s = 0;
                 }
             }
-            trusted.add(s);
+            trusted[i++] = s;
             if (s < min && s != 0) {
                 min = s;
             }
@@ -33,7 +34,8 @@ public class DepthMap {
         }
         this.min = min;
         this.max = max;
-        this.trustedSample = trusted;
+        this.rawSample = sample;
+        this.sample = trusted;
         this.dimensions = dimensions;
     }
 
@@ -54,8 +56,15 @@ public class DepthMap {
     /**
      * @return the trusted depth map sample with all untrusted values set to 0
      */
-    public LinkedList<Short> getTrustedSample() {
-        return trustedSample;
+    public short[] getSample() {
+        return sample;
+    }
+
+    /**
+     * @return the raw data
+     */
+    public short[] getRawSample() {
+        return rawSample;
     }
 
     /**

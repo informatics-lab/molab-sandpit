@@ -1,0 +1,28 @@
+MaterialDef Terrain {
+
+    MaterialParameters {
+        Texture2D RawDepthMap
+        Float MaxDepthValue
+        Float MinDepthValue
+        Float TerrainWidth
+        Float TerrainHeight
+    }
+
+    Technique {
+        VertexShader GLSL100:   assets/terrain/Texture.vert
+        FragmentShader GLSL100: assets/terrain/ShowNormals.frag
+
+        WorldParameters {
+            WorldViewProjectionMatrix
+            ViewMatrix
+            ProjectionMatrix
+            WorldMatrix
+            ModelMatrix
+        }
+
+    }
+
+    Technique {
+    }
+
+}

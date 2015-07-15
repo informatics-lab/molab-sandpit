@@ -28,6 +28,7 @@ public class Application extends SimpleApplication {
     // Physics engine of the app
     private BulletAppState bulletAppState;
 
+
     private Camera3D camera3D;
     private TerrainQuad terrain;
 
