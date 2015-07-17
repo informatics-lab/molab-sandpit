@@ -98,6 +98,13 @@
             <artifactId>guava</artifactId>
             <version>18.0</version>
         </dependency>
+
+        <!-- OpenCV -->
+        <!--<dependency>-->
+            <!--<groupId>org.bytedeco</groupId>-->
+            <!--<artifactId>javacv</artifactId>-->
+            <!--<version>1.0</version>-->
+        <!--</dependency>-->
         
     </dependencies>
     

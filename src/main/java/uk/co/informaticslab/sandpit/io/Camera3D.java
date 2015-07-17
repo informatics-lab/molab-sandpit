@@ -1,6 +1,6 @@
 package uk.co.informaticslab.sandpit.io;
 
-import uk.co.informaticslab.sandpit.domain.Dimension2D;
+import com.jme3.math.Vector2f;
 
 /**
  * Interface for the 3D camera
@@ -10,7 +10,7 @@ public interface Camera3D {
     /**
      * @return the dimensions of the depth map
      */
-    Dimension2D getDepthMapDimensions();
+    Vector2f getDepthMapDimensions();
 
 
     /**

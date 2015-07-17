@@ -1,7 +1,7 @@
 package uk.co.informaticslab.sandpit.utils;
 
+import com.jme3.math.Vector2f;
 import uk.co.informaticslab.sandpit.domain.DepthMap;
-import uk.co.informaticslab.sandpit.domain.Dimension2D;
 
 /**
  * Created by tom on 26/06/2015.
@@ -22,15 +22,16 @@ public class HeightMapUtils {
         return t3;
     }
 
-    public static float[] createHeightMapFromDepthMap(DepthMap depthMap, int quadSize) {
-        float[] heightMap = new float[quadSize * quadSize];
-        Dimension2D dimensions = depthMap.getDimensions();
+    public static float[] createHeightMapFromDepthMap(DepthMap depthMap, int scalingFactor) {
         short[] values = depthMap.getSample();
+        float[] heightMap = new float[values.length];
+        Vector2f dimensions = depthMap.getDimensions();
 
         int i = 0;
-        for (int y = 0; y < dimensions.getHeight(); y++) {
-            for (int x = 0; x < dimensions.getWidth(); x++) {
-                heightMap[(y * quadSize) + x] = mapDepthMapValueToHeightMapValue(values[i++], depthMap.getMin(), depthMap.getMax());
+        for (int y = 0; y < dimensions.getY(); y++) {
+            for (int x = 0; x < dimensions.getX(); x++) {
+                heightMap[i] = mapDepthMapValueToHeightMapValue(values[i], depthMap.getMin(), depthMap.getMax()) / scalingFactor;
+                i++;
             }
         }
 

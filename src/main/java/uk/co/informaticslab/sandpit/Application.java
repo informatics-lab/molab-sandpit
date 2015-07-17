@@ -14,12 +14,10 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
-import com.jme3.terrain.geomipmap.TerrainQuad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.io.impl.Mock3DCamera;
-import uk.co.informaticslab.sandpit.terrain.MyTerrainBuilder;
+import uk.co.informaticslab.sandpit.terrain.MyTerrain;
 
 public class Application extends SimpleApplication {
 
@@ -28,9 +26,7 @@ public class Application extends SimpleApplication {
     // Physics engine of the app
     private BulletAppState bulletAppState;
 
-
-    private Camera3D camera3D;
-    private TerrainQuad terrain;
+    private MyTerrain myTerrain;
 
     private ParticleEmitter points;
 
@@ -49,29 +45,31 @@ public class Application extends SimpleApplication {
     public void simpleInitApp() {
 
         LOG.debug("Initialising app");
-        flyCam.setMoveSpeed(100f);
 
-        viewPort.setBackgroundColor(ColorRGBA.Red);
+        //set up app
+        flyCam.setMoveSpeed(20f);
+        viewPort.setBackgroundColor(ColorRGBA.Black);
+        settings.setFrameRate(25);
 
-        settings.setFrameRate(30);
-
-        camera3D = new Mock3DCamera();
-
+        //set up physics engine in the app
         bulletAppState = new BulletAppState();
         bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
         stateManager.attach(bulletAppState);
 
+        //add a lightsource
         sun();
-        terrain = MyTerrainBuilder.buildAsTerrainQuad(assetManager, cam, bulletAppState, camera3D);
-        rootNode.attachChild(terrain);
-        rain();
+
+
+        //add my terrain!!
+        //change 3DCamera implementation to switch real/mock data
+        myTerrain = new MyTerrain(assetManager, bulletAppState, new Mock3DCamera());
+        rootNode.attachChild(myTerrain.getGeometry());
+
+//        rain();
 
 
         inputManager.addMapping("shoot", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addListener(actionListener, "shoot");
-
-        cam.setLocation(new Vector3f(160, 120, -10));
-        cam.lookAtDirection(new Vector3f(0, -1.5f, -1).normalizeLocal(), Vector3f.UNIT_Y);
 
     }
 

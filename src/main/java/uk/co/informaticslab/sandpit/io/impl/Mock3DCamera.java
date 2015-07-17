@@ -5,7 +5,7 @@
  */
 package uk.co.informaticslab.sandpit.io.impl;
 
-import uk.co.informaticslab.sandpit.domain.Dimension2D;
+import com.jme3.math.Vector2f;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 
 import java.io.BufferedReader;
@@ -21,8 +21,8 @@ import java.util.List;
 public class Mock3DCamera implements Camera3D {
 
     @Override
-    public Dimension2D getDepthMapDimensions() {
-        return new Dimension2D(320, 240);
+    public Vector2f getDepthMapDimensions() {
+        return new Vector2f(320, 240);
     }
 
     @Override

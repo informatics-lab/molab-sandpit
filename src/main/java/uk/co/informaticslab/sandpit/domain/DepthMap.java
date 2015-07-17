@@ -1,18 +1,20 @@
 package uk.co.informaticslab.sandpit.domain;
 
+import com.jme3.math.Vector2f;
+
 /**
  * Created by tom on 26/06/2015.
  */
 public class DepthMap {
 
-    private final Dimension2D dimensions;
+    private final Vector2f dimensions;
     private final short min;
     private final short max;
     private final short[] sample;
     private final short[] rawSample;
 
 
-    public DepthMap(Dimension2D dimensions, short[] sample, short... untrustedValues) {
+    public DepthMap(Vector2f dimensions, short[] sample, short... untrustedValues) {
         short min = Short.MAX_VALUE;
         short max = Short.MIN_VALUE;
 
@@ -70,7 +72,7 @@ public class DepthMap {
     /**
      * @return the 2D dimensions
      */
-    public Dimension2D getDimensions() {
+    public Vector2f getDimensions() {
         return dimensions;
     }
 }
