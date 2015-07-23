@@ -25,7 +25,6 @@ public class Application extends SimpleApplication {
 
     // Physics engine of the app
     private BulletAppState bulletAppState;
-
     private MyTerrain myTerrain;
 
     private ParticleEmitter points;
@@ -50,6 +49,10 @@ public class Application extends SimpleApplication {
         flyCam.setMoveSpeed(20f);
         viewPort.setBackgroundColor(ColorRGBA.Black);
         settings.setFrameRate(25);
+
+        //set camera to centre of terrain looking directly down
+        cam.setLocation(new Vector3f(160, 300, -120));
+        cam.lookAt(new Vector3f(160, 0, -120), new Vector3f(0,1,0));
 
         //set up physics engine in the app
         bulletAppState = new BulletAppState();

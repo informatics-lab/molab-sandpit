@@ -4,8 +4,7 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector2f;
+import com.jme3.math.*;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import uk.co.informaticslab.sandpit.io.Camera3D;
@@ -30,9 +29,13 @@ public class MyTerrain {
         this.geometry = new Geometry("terrain", mesh);
 
         //add the skin to our underlying mesh - se below for some predefined materials :)
-        Material material = getSolid(assetManager);
+        Material material = getNormals(assetManager);
         geometry.setMaterial(material);
-        //TODO transform geometry to be the correct orientation (will make gravity work)
+
+        //transform the terrain so that the y axis is up/down
+        Quaternion tip270 = new Quaternion();
+        tip270.fromAngleAxis(FastMath.PI*3/2, new Vector3f(1, 0, 0));
+        geometry.setLocalRotation(tip270);
 
         //make the terrain a solid surface
         RigidBodyControl floorPhysics = new RigidBodyControl(0.0f);
@@ -45,6 +48,7 @@ public class MyTerrain {
     }
 
     public void updateTerrainHeights() {
+        //TODO update the height of the rendered terrain by resampling the depth map.
         Mesh m = geometry.getMesh();
     }
 
