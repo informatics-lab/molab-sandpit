@@ -1,5 +1,9 @@
 MaterialDef TerrainGraphics {
 
+    MaterialParameters {
+            Texture2D ColorMap
+    }
+
     Technique {
         VertexShader GLSL100:   assets/terrain/Texture.vert
         FragmentShader GLSL100: assets/terrain/TerrainGraphics.frag

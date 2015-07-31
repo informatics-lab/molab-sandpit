@@ -4,9 +4,12 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
+import com.jme3.material.RenderState;
 import com.jme3.math.*;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
+import com.jme3.scene.VertexBuffer;
+import com.jme3.util.BufferUtils;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.utils.DepthMapUtils;
 import uk.co.informaticslab.sandpit.utils.HeightMapUtils;
@@ -29,12 +32,12 @@ public class MyTerrain {
         this.geometry = new Geometry("terrain", mesh);
 
         //add the skin to our underlying mesh - se below for some predefined materials :)
-        Material material = getNormals(assetManager);
+        Material material = getCustom(assetManager);
         geometry.setMaterial(material);
 
         //transform the terrain so that the y axis is up/down
         Quaternion tip270 = new Quaternion();
-        tip270.fromAngleAxis(FastMath.PI*3/2, new Vector3f(1, 0, 0));
+        tip270.fromAngleAxis(FastMath.PI * 3 / 2, new Vector3f(1, 0, 0));
         geometry.setLocalRotation(tip270);
 
         //make the terrain a solid surface
@@ -47,13 +50,28 @@ public class MyTerrain {
         return geometry;
     }
 
+    /**
+     * Gets the current mesh and updates the vertices based on the currently sampled depth map.
+     */
     public void updateTerrainHeights() {
-        //TODO update the height of the rendered terrain by resampling the depth map.
         Mesh m = geometry.getMesh();
+        float[] heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4);
+        Vector2f depthMapDims = camera3D.getDepthMapDimensions();
+        Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY(), heights);
+        m.getBuffer(VertexBuffer.Type.Position).updateData(BufferUtils.createFloatBuffer(vertices));
     }
 
     private static Material getNormals(AssetManager assetManager) {
         return new Material(assetManager, "Common/MatDefs/Misc/ShowNormals.j3md");  // create a simple material
+    }
+
+    private static Material getCustom(AssetManager assetManager) {
+        Material mat = new Material(assetManager, "assets/terrain/TerrainGraphics.j3md");
+        mat.setTexture("ColorMap", assetManager.loadTexture("assets/terrain-color-map.png"));
+
+        //tells it not to bother rendering the back of the faces
+        mat.getAdditionalRenderState().setFaceCullMode(RenderState.FaceCullMode.Back);
+        return mat;
     }
 
     private static Material getSolid(AssetManager assetManager) {

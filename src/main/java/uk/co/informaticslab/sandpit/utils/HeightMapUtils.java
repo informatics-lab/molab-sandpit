@@ -30,7 +30,9 @@ public class HeightMapUtils {
         int i = 0;
         for (int y = 0; y < dimensions.getY(); y++) {
             for (int x = 0; x < dimensions.getX(); x++) {
-                heightMap[i] = mapDepthMapValueToHeightMapValue(values[i], depthMap.getMin(), depthMap.getMax()) / scalingFactor;
+                //use this index to flip the heights array horizontally
+                int index = (((int)dimensions.getX()-1) - x)+(y*((int)dimensions.getX()));
+                heightMap[index] = mapDepthMapValueToHeightMapValue(values[i], depthMap.getMin(), depthMap.getMax()) / scalingFactor;
                 i++;
             }
         }
