@@ -44,8 +44,8 @@ public class Senz3DCamera implements Camera3D, Closeable {
     public Vector2f getDepthMapDimensions() {
         int[] depthMapSize = new int[2];
         pipeline.QueryDepthMapSize(depthMapSize);
-        LOG.debug("Depth map size width : " + depthMapSize[0]);
-        LOG.debug("Depth map size height : " + depthMapSize[1]);
+//        LOG.debug("Depth map size width : " + depthMapSize[0]);
+//        LOG.debug("Depth map size height : " + depthMapSize[1]);
         Vector2f dim = new Vector2f(depthMapSize[0], depthMapSize[1]);
         return dim;
     }

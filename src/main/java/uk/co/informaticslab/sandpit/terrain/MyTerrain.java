@@ -57,7 +57,7 @@ public class MyTerrain {
         Mesh m = geometry.getMesh();
         float[] heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4);
         Vector2f depthMapDims = camera3D.getDepthMapDimensions();
-        Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY(), heights);
+        Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY() - 1, heights);
         m.getBuffer(VertexBuffer.Type.Position).updateData(BufferUtils.createFloatBuffer(vertices));
     }
 

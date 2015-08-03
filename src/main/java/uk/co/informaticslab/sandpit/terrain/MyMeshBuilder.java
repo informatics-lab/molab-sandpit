@@ -9,11 +9,15 @@ import com.jme3.util.BufferUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by tom on 16/07/2015.
  */
 public class MyMeshBuilder {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(MyMeshBuilder.class);
 
     /**
      * Constructs the mesh.
@@ -48,7 +52,7 @@ public class MyMeshBuilder {
      * @param heights height values at each point in order
      * @return a 3 dimensional vector array of vertices in the order of x,y,z
      */
-    public static Vector3f[] getVertices(int dimensionX, int dimensionY, float[] heights) {
+    public static Vector3f[] getVertices(int dimensionX, int dimensionY, float[] heights) {     
         Vector3f[] vertices = new Vector3f[heights.length];
         int loopCount = 0;
         int heightsIndex = 0;

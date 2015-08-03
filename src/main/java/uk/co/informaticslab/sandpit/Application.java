@@ -16,7 +16,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.co.informaticslab.sandpit.io.impl.Mock3DCamera;
+import uk.co.informaticslab.sandpit.io.impl.Senz3DCamera;
 import uk.co.informaticslab.sandpit.terrain.MyTerrain;
 
 public class Application extends SimpleApplication {
@@ -65,7 +65,7 @@ public class Application extends SimpleApplication {
 
         //add my terrain!!
         //change 3DCamera implementation to switch real/mock data
-        myTerrain = new MyTerrain(assetManager, bulletAppState, new Mock3DCamera());
+        myTerrain = new MyTerrain(assetManager, bulletAppState, new Senz3DCamera());
         rootNode.attachChild(myTerrain.getGeometry());
 
 //        rain();
@@ -79,6 +79,7 @@ public class Application extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         LOG.trace("update");
+        myTerrain.updateTerrainHeights();
         //TODO: add update code
         // System.out.println("location : " + cam.getLocation() + ", height : " + cam.getHeight() + ", direction : " + cam.getDirection());
     }
