@@ -21,6 +21,7 @@ public class MyTerrain {
 
     private final Camera3D camera3D;
     private Geometry geometry;
+    private float avgTerrainHeight;
 
     public MyTerrain(AssetManager assetManager, BulletAppState bulletAppState, Camera3D camera3D) {
 
@@ -28,6 +29,7 @@ public class MyTerrain {
 
         Vector2f depthMapDims = camera3D.getDepthMapDimensions();
         float[] heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4);
+        avgTerrainHeight = HeightMapUtils.avgFloatArray(heights);
         Mesh mesh = MyMeshBuilder.buildMesh((int) depthMapDims.getX() - 1, (int) depthMapDims.getY() - 1, heights);
         this.geometry = new Geometry("terrain", mesh);
 
@@ -56,9 +58,12 @@ public class MyTerrain {
     public void updateTerrainHeights() {
         Mesh m = geometry.getMesh();
         float[] heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4);
-        Vector2f depthMapDims = camera3D.getDepthMapDimensions();
-        Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY() - 1, heights);
-        m.getBuffer(VertexBuffer.Type.Position).updateData(BufferUtils.createFloatBuffer(vertices));
+        float avg = HeightMapUtils.avgFloatArray(heights);
+        if(Math.abs(avgTerrainHeight-avg)>(avgTerrainHeight/10)) {
+            Vector2f depthMapDims = camera3D.getDepthMapDimensions();
+            Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY() - 1, heights);
+            m.getBuffer(VertexBuffer.Type.Position).updateData(BufferUtils.createFloatBuffer(vertices));
+        }
     }
 
     private static Material getNormals(AssetManager assetManager) {

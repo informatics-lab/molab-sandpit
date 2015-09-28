@@ -40,5 +40,12 @@ public class HeightMapUtils {
         return heightMap;
     }
 
+    public static float avgFloatArray(float[] floatArray) {
+        float sum = 0;
+        for( int i = 0; i < floatArray.length; i++) {
+            sum += floatArray[i];
+        }
+        return sum / floatArray.length;
+    }
 
 }
