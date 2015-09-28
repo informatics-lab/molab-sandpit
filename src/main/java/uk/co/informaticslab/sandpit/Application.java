@@ -14,6 +14,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Sphere;
+import com.jme3.system.AppSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.informaticslab.sandpit.io.impl.Senz3DCamera;
@@ -31,6 +32,11 @@ public class Application extends SimpleApplication {
 
     public static void main(String[] args) {
         Application app = new Application();
+        
+        AppSettings fps = new AppSettings(true);
+        fps.setFrameRate(4);
+        app.setSettings(fps);
+        
         app.start();
     }
 
@@ -48,7 +54,7 @@ public class Application extends SimpleApplication {
         //set up app
         flyCam.setMoveSpeed(20f);
         viewPort.setBackgroundColor(ColorRGBA.Black);
-        settings.setFrameRate(25);
+        settings.setFrameRate(2);
 
         //set camera to centre of terrain looking directly down
         cam.setLocation(new Vector3f(160, 300, -120));
