@@ -4,8 +4,10 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.effect.ParticleEmitter;
+import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
@@ -24,6 +26,8 @@ public class Application extends SimpleApplication {
 
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
 
+    private static final int FPS = 4;
+
     // Physics engine of the app
     private BulletAppState bulletAppState;
     private MyTerrain myTerrain;
@@ -34,7 +38,7 @@ public class Application extends SimpleApplication {
         Application app = new Application();
         
         AppSettings fps = new AppSettings(true);
-        fps.setFrameRate(4);
+        fps.setFrameRate(FPS);
         app.setSettings(fps);
         
         app.start();
@@ -54,7 +58,6 @@ public class Application extends SimpleApplication {
         //set up app
         flyCam.setMoveSpeed(20f);
         viewPort.setBackgroundColor(ColorRGBA.Black);
-        settings.setFrameRate(2);
 
         //set camera to centre of terrain looking directly down
         cam.setLocation(new Vector3f(160, 300, -120));
@@ -68,18 +71,19 @@ public class Application extends SimpleApplication {
         //add a lightsource
         sun();
 
-
         //add my terrain!!
         //change 3DCamera implementation to switch real/mock data
         myTerrain = new MyTerrain(assetManager, bulletAppState, new Senz3DCamera());
         rootNode.attachChild(myTerrain.getGeometry());
 
-//        rain();
+        setupKeys();
+    }
 
-
+    private void setupKeys() {
         inputManager.addMapping("shoot", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         inputManager.addListener(actionListener, "shoot");
-
+        inputManager.addMapping("configure", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addListener(actionListener, "configure");
     }
 
     @Override
@@ -104,6 +108,8 @@ public class Application extends SimpleApplication {
         public void onAction(String name, boolean keyPressed, float tpf) {
             if (name.equals("shoot") && !keyPressed) {
                 rain();
+            } else if(name.equals("configure") && !keyPressed) {
+                myTerrain.calibrateDepthMap();
             }
         }
     };

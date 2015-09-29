@@ -2,6 +2,7 @@ package uk.co.informaticslab.sandpit.utils;
 
 import com.jme3.math.Vector2f;
 import uk.co.informaticslab.sandpit.domain.DepthMap;
+import uk.co.informaticslab.sandpit.domain.DepthMapCalibration;
 
 /**
  * Created by tom on 26/06/2015.
@@ -26,13 +27,29 @@ public class HeightMapUtils {
         short[] values = depthMap.getSample();
         float[] heightMap = new float[values.length];
         Vector2f dimensions = depthMap.getDimensions();
-
         int i = 0;
         for (int y = 0; y < dimensions.getY(); y++) {
             for (int x = 0; x < dimensions.getX(); x++) {
                 //use this index to flip the heights array horizontally
                 int index = (((int)dimensions.getX()-1) - x)+(y*((int)dimensions.getX()));
                 heightMap[index] = mapDepthMapValueToHeightMapValue(values[i], depthMap.getMin(), depthMap.getMax()) / scalingFactor;
+                i++;
+            }
+        }
+
+        return heightMap;
+    }
+
+    public static float[] createHeightMapFromDepthMap(DepthMap depthMap, int scalingFactor, DepthMapCalibration depthMapCalibration) {
+        short[] values = depthMap.getSample();
+        float[] heightMap = new float[values.length];
+        Vector2f dimensions = depthMapCalibration.getDepthMapDimensions();
+        int i = 0;
+        for (int y = 0; y < dimensions.getY(); y++) {
+            for (int x = 0; x < dimensions.getX(); x++) {
+                //use this index to flip the heights array horizontally
+                int index = (((int)dimensions.getX()-1) - x)+(y*((int)dimensions.getX()));
+                heightMap[index] = mapDepthMapValueToHeightMapValue(values[i], depthMapCalibration.getMinValue(), depthMapCalibration.getMaxValue()) / scalingFactor;
                 i++;
             }
         }

@@ -10,6 +10,8 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
+import uk.co.informaticslab.sandpit.domain.DepthMap;
+import uk.co.informaticslab.sandpit.domain.DepthMapCalibration;
 import uk.co.informaticslab.sandpit.io.Camera3D;
 import uk.co.informaticslab.sandpit.utils.DepthMapUtils;
 import uk.co.informaticslab.sandpit.utils.HeightMapUtils;
@@ -22,6 +24,7 @@ public class MyTerrain {
     private final Camera3D camera3D;
     private Geometry geometry;
     private float avgTerrainHeight;
+    private DepthMapCalibration depthMapCalibration;
 
     public MyTerrain(AssetManager assetManager, BulletAppState bulletAppState, Camera3D camera3D) {
 
@@ -57,13 +60,26 @@ public class MyTerrain {
      */
     public void updateTerrainHeights() {
         Mesh m = geometry.getMesh();
-        float[] heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4);
+        float[] heights;
+        Vector2f depthMapDims;
+        if(depthMapCalibration == null) {
+            heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4);
+            depthMapDims = camera3D.getDepthMapDimensions();
+        } else {
+            heights = HeightMapUtils.createHeightMapFromDepthMap(DepthMapUtils.getDepthMapFromCamera(camera3D), 4, depthMapCalibration);
+            depthMapDims = depthMapCalibration.getDepthMapDimensions();
+        }
         float avg = HeightMapUtils.avgFloatArray(heights);
-        if(Math.abs(avgTerrainHeight-avg)>(avgTerrainHeight/10)) {
-            Vector2f depthMapDims = camera3D.getDepthMapDimensions();
+        if(Math.abs(avgTerrainHeight-avg)<(avgTerrainHeight/10)) {
             Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY() - 1, heights);
             m.getBuffer(VertexBuffer.Type.Position).updateData(BufferUtils.createFloatBuffer(vertices));
         }
+    }
+
+    public void calibrateDepthMap() {
+        DepthMap dm = DepthMapUtils.getDepthMapFromCamera(camera3D);
+        DepthMapCalibration dmc = new DepthMapCalibration(dm.getMin(),dm.getMax(),dm.getDimensions());
+        this.depthMapCalibration = dmc;
     }
 
     private static Material getNormals(AssetManager assetManager) {
