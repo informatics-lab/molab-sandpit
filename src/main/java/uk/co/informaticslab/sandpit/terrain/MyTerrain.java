@@ -70,7 +70,7 @@ public class MyTerrain {
             depthMapDims = depthMapCalibration.getDepthMapDimensions();
         }
         float avg = HeightMapUtils.avgFloatArray(heights);
-        if(Math.abs(avgTerrainHeight-avg)<(avgTerrainHeight/10)) {
+        if(Math.abs(avgTerrainHeight-avg)<(avgTerrainHeight/3)) {
             Vector3f[] vertices = MyMeshBuilder.getVertices((int) depthMapDims.getX() - 1, (int) depthMapDims.getY() - 1, heights);
             m.getBuffer(VertexBuffer.Type.Position).updateData(BufferUtils.createFloatBuffer(vertices));
         }
