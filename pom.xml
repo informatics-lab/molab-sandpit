@@ -99,12 +99,17 @@
             <version>18.0</version>
         </dependency>
 
-        <!-- OpenCV -->
-        <!--<dependency>-->
-            <!--<groupId>org.bytedeco</groupId>-->
-            <!--<artifactId>javacv</artifactId>-->
-            <!--<version>1.0</version>-->
-        <!--</dependency>-->
+        <!-- BoofCV -->
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>all</artifactId>
+            <version>0.23</version>
+        </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>openkinect</artifactId>
+            <version>0.23</version>
+        </dependency>
         
     </dependencies>
     

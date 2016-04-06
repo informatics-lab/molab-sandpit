@@ -21,7 +21,7 @@ public class Senz3DCamera implements Camera3D, Closeable {
 
     public static final short UNTRUSTED_VALUE = 32001;
 
-    private static final Logger LOG = LoggerFactory.getLogger(Camera3D.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Senz3DCamera.class);
 
     private final PXCUPipeline pipeline;
 
